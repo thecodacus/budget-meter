@@ -7,7 +7,6 @@ import { StoreService } from 'src/app/services/store.service';
   templateUrl: './total-savings.component.html',
   styleUrls: ['./total-savings.component.scss']
 })
-
 export class TotalSavingsComponent implements OnInit {
   @Input() title: string = 'Total Savings';
   icon: string = 'fas fa-piggy-bank';

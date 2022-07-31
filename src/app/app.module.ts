@@ -12,10 +12,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app.routing';
 import { ComponentsModule } from './components/components.module';
-import { WidgetsModule } from './widgets/widgets.module';
-import { TotalIncomeComponent } from './widgets/Cards/total-income/total-income.component';
-import { TotalExpensesComponent } from './widgets/Cards/total-expenses/total-expenses.component';
-import { TotalSavingsComponent } from './widgets/Cards/total-savings/total-savings.component';
 
 
 @NgModule({

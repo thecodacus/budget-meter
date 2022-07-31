@@ -26,8 +26,8 @@ export class BarChartBaseComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    parseOptions(Chart, chartOptions());
-    this.chart = new Chart(this.canvas, {
+    // parseOptions(Chart, chartOptions());
+    this.chart = new Chart(this.canvas.nativeElement, {
       type: 'bar',
       options: chartExample2.options,
       data: chartExample2.data
