@@ -1,47 +1,62 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
-
+import { BehaviorSubject, combineLatest, firstValueFrom, map, Observable, ReplaySubject, Subject, switchMap } from 'rxjs';
+import { AngularFirestore, DocumentReference } from '@angular/fire/compat/firestore'
+import { idToken, User } from '@angular/fire/auth';
+import { increment } from "firebase/firestore";
+import { AuthService } from './auth.service';
 
 export enum TransactionCategory {
-  GROCERY,
-  FOOD,
-  ENTERTAINMENT,
-  TRANSPORT,
-  SHOPPING,
-  RENT,
-  EMI,
-  OTHER,
-  SALARY,
+  GROCERY = 'GROCERY',
+  FOOD = 'FOOD',
+  ENTERTAINMENT = 'ENTERTAINMENT',
+  TRANSPORT = 'TRANSPORT',
+  SHOPPING = 'SHOPPING',
+  RENT = 'RENT',
+  EMI = 'EMI',
+  OTHER = 'OTHER',
+  SALARY = 'SALARY',
 }
 export enum TransactionType {
-  INCOME,
-  EXPENSE
+  INCOME = "INCOME",
+  EXPENSE = "EXPENSE",
+}
+
+export enum PaymentMode {
+  CASH = 'CASH',
+  CREDITCARD = 'CREDITCARD',
+  NETBANKING = 'NETBANKING',
+  UPI = 'UPI',
+  DIGITALWALLET = 'DIGITALWALLET',
+  OTHER = 'OTHER',
 }
 export interface ITransaction {
-  id: number;
+  id?: string;
   amount: number;
   date: Date;
   type: TransactionType;
   category?: TransactionCategory;
-  description: string;
-  accountId: {
-    id: number;
-    name: string;
-  }
-  externalId: {
-    id: number;
-    name: string;
-  }
+  paymentMode?: PaymentMode;
+  description?: string;
+  accountId: string;
+  counterpartyId: string;
 }
-export interface IExternalEntity {
-  id: number;
+export interface ICounterPartyEntity {
+  id?: string;
   name: string;
 }
 export interface IAccount {
   type: "Bank" | "Wallet",
-  id: number;
+  id?: string;
   name: string;
   balance: number;
+  lastCorrected?: Date;
+  last4Digits?: number;
+  Address?: {
+    address: string,
+    city: string,
+    country: string,
+    postalCode: number
+  }
 }
 export interface IStore {
   Accounts: IAccount[],
@@ -49,190 +64,354 @@ export interface IStore {
   Budget: {
     monthly: number,
   },
-  Payees: IExternalEntity[]
+  CounterParties: ICounterPartyEntity[]
+}
+export enum StoreConstants {
+  DBCOLLECTION = 'expense-tracker',
+  ACCOUNTS = 'Accounts',
+  TRANSACTIONS = 'Transactions',
+  COUNTERPARTIES = 'CounterParties',
+  BUDGET = 'Budget'
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoreService {
-  private store: IStore = {
-    Accounts: [],
-    Transactions: [],
-    Budget: {
-      monthly: 0
-    },
-    Payees: []
+  private storeId$: ReplaySubject<string>
+  constructor(private db: AngularFirestore) {
+    this.storeId$ = new ReplaySubject(1);
+    // this.auth.getCurrentUser()
+    //   .then(user => {
+    //     if (user) this.setStore(user)
+    //   })
   }
-  private store$: BehaviorSubject<IStore>;
-  constructor() {
-    this.store$ = new BehaviorSubject(this.store);
+  async setStore(userID: string) {
+    let userId = userID;
+    let query = await this.db.collection<{ userId: string, budget: { monthly } }>(StoreConstants.DBCOLLECTION).ref.where('userId', '==', userId).get()
+    if (query.docs.length == 0) {
+      let collection = this.db.collection<{ userId: string, budget: { monthly } }>(StoreConstants.DBCOLLECTION)
+      let doc = await collection.add({
+        userId,
+        budget: {
+          monthly: 0
+        }
+      })
+      this.storeId$.next(doc.id)
+      await this.addAccount({
+        name: 'Wallet',
+        balance: 0,
+        type: "Wallet"
+      })
+    }
+    else {
+      this.storeId$.next(query.docs[0].id)
+    }
+    // this.store$.next(this.store);
   }
-  setStore(store: IStore) {
-    this.store = store;
-    this.store$.next(this.store);
+  createNewId() {
+    return this.db.createId()
   }
-  getStore(): Observable<IStore> {
-    return this.store$.asObservable();
+  getStore(): Observable<string> {
+    return this.storeId$.asObservable()
   }
   getAccounts(): Observable<IAccount[]> {
-    return this.store$.pipe(
-      map(store => store.Accounts)
-    );
+    return this.getStore().pipe(switchMap(id => this.db.collection(StoreConstants.DBCOLLECTION)
+      .doc(id)
+      .collection<IAccount>(StoreConstants.ACCOUNTS)
+      .valueChanges()))
   }
   getTransactions(startDate: Date, endDate: Date): Observable<ITransaction[]> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.date >= startDate && transaction.date <= endDate))
-    );
+    return this.getStore().pipe(switchMap(id => this.db.collection(StoreConstants.DBCOLLECTION)
+      .doc(id)
+      .collection<ITransaction>(StoreConstants.TRANSACTIONS, ref => ref.where('date', ">=", startDate).where('date', "<=", endDate))
+      .valueChanges()))
   }
   getBudget(): Observable<IStore["Budget"]> {
-    return this.store$.pipe(
-      map(store => store.Budget)
-    );
+    return this.getStore().pipe(switchMap(id => this.db.collection(StoreConstants.DBCOLLECTION)
+      .doc<{ userId: string, budget: { monthly } }>(id)
+      .valueChanges().pipe(
+        map(x => {
+          return {
+            ...x.budget
+          }
+        })
+      )))
   }
-  getPayees(): Observable<IExternalEntity[]> {
-    return this.store$.pipe(
-      map(store => store.Payees)
-    );
+  getCounterParties(): Observable<ICounterPartyEntity[]> {
+    return this.getStore().pipe(
+      switchMap(id => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(id)
+        .collection<ICounterPartyEntity>(StoreConstants.COUNTERPARTIES)
+        .valueChanges()))
   }
-  getAccount(id: number): Observable<IAccount> {
-    return this.store$.pipe(
-      map(store => store.Accounts.find(account => account.id === id))
-    );
+  getAccount(id: string): Observable<IAccount> {
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<IAccount>(StoreConstants.ACCOUNTS)
+        .doc(id)
+        .valueChanges()))
   }
-  getTransaction(id: number): Observable<ITransaction> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .find(transaction => transaction.id === id))
-    );
+  getTransaction(id: string): Observable<ITransaction> {
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS)
+        .doc(id)
+        .valueChanges()))
   }
-  getPayee(id: number): Observable<IExternalEntity> {
-    return this.store$.pipe(
-      map(store => store.Payees
-        .find(payee => payee.id === id))
-    );
+  getCaunterParty(id: string): Observable<ICounterPartyEntity> {
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ICounterPartyEntity>(StoreConstants.COUNTERPARTIES)
+        .doc(id)
+        .valueChanges()))
   }
-  getTransactionsByAccount(accountId: number, startDate: Date, endDate: Date): Observable<ITransaction[]> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.accountId.id === accountId && transaction.date >= startDate && transaction.date <= endDate))
-    );
+  getTransactionsByAccount(accountId: string, startDate: Date, endDate: Date): Observable<ITransaction[]> {
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS,
+          ref => ref.where('accountId', '==', accountId)
+            .where('date', '>=', startDate)
+            .where('date', "<=", endDate)
+        ).valueChanges()))
   }
-  getTransactionsByPayee(payeeId: number, startDate: Date, endDate: Date): Observable<ITransaction[]> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.externalId.id === payeeId && transaction.date >= startDate && transaction.date <= endDate))
-    );
+  getTransactionsByCounterparty(counterpartyId: string, startDate: Date, endDate: Date): Observable<ITransaction[]> {
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS,
+          ref => ref.where('counterpartyId', '==', counterpartyId)
+            .where('date', '>=', startDate)
+            .where('date', "<=", endDate)
+        ).valueChanges()))
   }
   getTransactionsByType(type: TransactionType, startDate: Date, endDate: Date): Observable<ITransaction[]> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.type === type && transaction.date >= startDate && transaction.date <= endDate))
-    );
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS,
+          ref => ref.where('type', '==', type)
+            .where('date', '>=', startDate)
+            .where('date', "<=", endDate)
+        ).valueChanges()))
   }
-  getTransactionsByCategory(expenceType: TransactionCategory, startDate: Date, endDate: Date): Observable<ITransaction[]> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.category === expenceType && transaction.date >= startDate && transaction.date <= endDate))
-    );
+  getTransactionsByCategory(expenseType: TransactionCategory, startDate: Date, endDate: Date): Observable<ITransaction[]> {
+    return this.getStore().pipe(
+      switchMap(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS,
+          ref => ref.where('category', '==', expenseType)
+            .where('date', '>=', startDate)
+            .where('date', "<=", endDate)
+        ).valueChanges()))
   }
   // adding operations
-  addAccount(account: IAccount) {
-    this.store.Accounts.push(account);
-    this.store$.next(this.store);
+  async addAccount(account: IAccount) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => {
+        let newDoc = this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .collection<IAccount>(StoreConstants.ACCOUNTS).doc()
+        return newDoc.set({
+          ...account,
+          id: newDoc.ref.id
+        })
+
+      })
+    // this.setStore(this.store);
   }
-  addTransaction(transaction: ITransaction) {
-    this.store.Transactions.push(transaction);
-    this.store$.next(this.store);
+  async addTransaction(transaction: ITransaction) {
+    await firstValueFrom(this.getStore())
+      .then(storeId => {
+        let newDoc = this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .collection<ITransaction>(StoreConstants.TRANSACTIONS).doc()
+        return newDoc.set({
+          ...transaction,
+          id: newDoc.ref.id
+        })
+      })
+
+    await this._performTransaction(transaction);
+    // this.setStore(this.store);
   }
-  addPayee(payee: IExternalEntity) {
-    this.store.Payees.push(payee);
-    this.store$.next(this.store);
+  async addCounterParty(data: ICounterPartyEntity) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => {
+        let newDoc = this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .collection<ICounterPartyEntity>(StoreConstants.COUNTERPARTIES).doc()
+        return newDoc.set({
+          ...data,
+          id: newDoc.ref.id
+        })
+      })
+    // this.setStore(this.store);
   }
+
   // updating operations
-  updateAccount(account: IAccount) {
-    const index = this.store.Accounts.findIndex(acc => acc.id === account.id);
-    this.store.Accounts[index] = account;
-    this.store$.next(this.store);
+  async updateBudget(budget: IStore["Budget"]) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => {
+        return this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .update({
+            budget
+          })
+      })
   }
-  updateTransaction(transaction: ITransaction) {
-    const index = this.store.Transactions.findIndex(tran => tran.id === transaction.id
-    );
-    this._revertTransaction(transaction.id)
-    this.store.Transactions[index] = transaction;
-    this.store$.next(this.store);
+  async updateAccount(account: IAccount) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<IAccount>(StoreConstants.ACCOUNTS)
+        .doc(account.id)
+        .set(account))
+    // this.setStore(this.store);
   }
-  updatePayee(payee: IExternalEntity) {
-    const index = this.store.Payees.findIndex(pay => pay.id === payee.id);
-    this.store.Payees[index] = payee;
-    this.store$.next(this.store);
+
+  async updateTransaction(transaction: ITransaction) {
+    await this._revertTransaction(transaction.id)
+    await this._performTransaction(transaction);
+    return firstValueFrom(this.getStore())
+      .then(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS)
+        .doc(transaction.id)
+        .set(transaction))
+
+    // this.setStore(this.store);
+  }
+  async updateCounterParty(counterparty: ICounterPartyEntity) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ICounterPartyEntity>(StoreConstants.COUNTERPARTIES)
+        .doc(counterparty.id)
+        .set(counterparty))
   }
   // deleting operations
-  deleteAccount(accountId: number) {
-    const index = this.store.Accounts.findIndex(acc => acc.id === accountId);
-    this.store.Accounts.splice(index, 1);
-    this.store$.next(this.store);
+  async deleteAccount(accountId: string) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<IAccount>(StoreConstants.ACCOUNTS)
+        .doc(accountId).delete())
+    // this.setStore(this.store);
   }
-  deleteTransaction(transactionId: number) {
-    const index = this.store.Transactions.findIndex(tran => tran.id === transactionId);
-    this._revertTransaction(transactionId)
-    this.store.Transactions.splice(index, 1);
-    this.store$.next(this.store);
+  async deleteTransaction(transactionId: string) {
+    await this._revertTransaction(transactionId)
+    return firstValueFrom(this.getStore())
+      .then(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ITransaction>(StoreConstants.TRANSACTIONS)
+        .doc(transactionId).delete())
+    // this.setStore(this.store);
   }
-  deletePayee(payeeId: number) {
-    const index = this.store.Payees.findIndex(pay => pay.id === payeeId);
-    this.store.Payees.splice(index, 1);
-    this.store$.next(this.store);
+  async deleteCounterParty(cointerpartyId: string) {
+    return firstValueFrom(this.getStore())
+      .then(storeId => this.db.collection(StoreConstants.DBCOLLECTION)
+        .doc(storeId)
+        .collection<ICounterPartyEntity>(StoreConstants.COUNTERPARTIES)
+        .doc(cointerpartyId).delete())
+    // this.setStore(this.store);
   }
 
   // other operations
   getTotalBalance(): Observable<number> {
-    return this.store$.pipe(
-      map(store => store.Accounts.reduce((acc, account) => acc + account.balance, 0))
+    return this.getAccounts().pipe(
+      map(accounts => accounts.reduce((acc, account) => acc + account.balance, 0))
     );
   }
-  getTotalExpence(startDate: Date, endDate: Date): Observable<number> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.date >= startDate && transaction.date <= endDate)
+  getTotalExpense(startDate: Date, endDate: Date): Observable<number> {
+    return this.getTransactionsByType(TransactionType.EXPENSE, startDate, endDate).pipe(
+      map(transactions => transactions
         .reduce((acc, transaction) => acc + transaction.amount, 0))
     );
   }
   getTotalIncome(startDate: Date, endDate: Date): Observable<number> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.date >= startDate && transaction.date <= endDate)
+    return this.getTransactionsByType(TransactionType.INCOME, startDate, endDate).pipe(
+      map(transactions => transactions
         .reduce((acc, transaction) => acc + transaction.amount, 0))
     );
   }
-  getTotalExpenceByCategory(type: TransactionCategory, startDate: Date, endDate: Date): Observable<number> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.date >= startDate && transaction.date <= endDate && transaction.category === type && transaction.type === TransactionType.EXPENSE)
+  getTotalExpenseByCategory(category: TransactionCategory, startDate: Date, endDate: Date): Observable<number> {
+    return this.getTransactionsByCategory(category, startDate, endDate).pipe(
+      map(transactions => transactions
+        .filter(x => x.type == TransactionType.EXPENSE)
         .reduce((acc, transaction) => acc + transaction.amount, 0))
     );
   }
-  getTotalIncomeByCategory(type: TransactionCategory, startDate: Date, endDate: Date): Observable<number> {
-    return this.store$.pipe(
-      map(store => store.Transactions
-        .filter(transaction => transaction.date >= startDate && transaction.date <= endDate && transaction.category === type && transaction.type === TransactionType.INCOME)
+  getTotalIncomeByCategory(category: TransactionCategory, startDate: Date, endDate: Date): Observable<number> {
+    return this.getTransactionsByCategory(category, startDate, endDate).pipe(
+      map(transactions => transactions
+        .filter(x => x.type == TransactionType.INCOME)
         .reduce((acc, transaction) => acc + transaction.amount, 0))
     );
+  }
+
+  getTransactionCategories() {
+    return Object.keys(TransactionCategory).filter(x => isNaN(Number(TransactionCategory[x])))
+  }
+  getTransactionTypes() {
+    return Object.keys(TransactionType).filter(x => isNaN(Number(TransactionType[x])))
+  }
+  getPaymentModes() {
+    return Object.keys(PaymentMode).filter(x => isNaN(Number(PaymentMode[x])))
+  }
+
+  //current month operations
+  getCurrentMonthTotalExpense(): Observable<number> {
+    return this.getTotalExpense(new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date());
+  }
+  getCurrentMonthIncome(): Observable<number> {
+    return this.getTotalIncome(new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date());
+  }
+  getCurrentMonthBudget(): Observable<{ budget: number, expense: number }> {
+    return combineLatest([this.getBudget(), this.getCurrentMonthTotalExpense()]).pipe(
+      map(([budget, expense]) => ({ budget: budget.monthly, expense: expense }))
+    );
+  }
+  getCurrentMonthExpenses(): Observable<ITransaction[]> {
+    return this.getTransactionsByType(TransactionType.EXPENSE, new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date());
   }
 
   // private methods
-  private _revertTransaction(transactionId: number) {
-    const transaction = this.store.Transactions
-      .find(transaction => transaction.id === transactionId);
+  private async _revertTransaction(transactionId: string) {
+    return await firstValueFrom(this.getStore())
+      .then(async storeId => {
+        let transactionObj = await firstValueFrom(this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .collection<ITransaction>(StoreConstants.TRANSACTIONS)
+          .doc<ITransaction>(transactionId).get())
 
-    let account = this.store.Accounts.find(account => account.id === transaction.accountId.id)
-    if (transaction.type === TransactionType.INCOME) {
-      account.balance -= transaction.amount;
-    }
-    else {
-      account.balance += transaction.amount;
-    }
+        let transaction = transactionObj.data();
+        let amount = transaction.amount * -1;
+        if (transaction.type == TransactionType.EXPENSE) amount = transaction.amount;
+        return await this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .collection<IAccount>(StoreConstants.ACCOUNTS)
+          .doc<IAccount>(transaction.accountId).ref.update({
+            balance: increment(amount)
+          })
+      })
+  }
+  private async _performTransaction(transaction: ITransaction) {
+    return await firstValueFrom(this.getStore())
+      .then(async storeId => {
+        let amount = transaction.amount
+        if (transaction.type == TransactionType.EXPENSE) amount = transaction.amount * -1
+        return await this.db.collection(StoreConstants.DBCOLLECTION)
+          .doc(storeId)
+          .collection<IAccount>(StoreConstants.ACCOUNTS)
+          .doc<IAccount>(transaction.accountId).ref.update({
+            balance: increment(amount)
+          })
+      })
   }
 
 }

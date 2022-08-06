@@ -1,0 +1,11 @@
+
+td{
+    &.income{
+        color: green;
+        font-weight: bold;
+    }
+    &.expense{
+        color: red;
+        font-weight: bold;
+    }
+}

@@ -14,6 +14,8 @@ export class TotalIncomeComponent implements OnInit {
   subtext: string = 'Since last month';
   value$: Observable<number>;
   constructor(public store: StoreService) {
+  }
+  ngOnInit(): void {
     this.value$ = this.store.getTotalIncome(new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`), new Date());
     let lastMonthIncome$ = this.store.getTotalIncome(new Date(
       `${new Date().getFullYear()}-${new Date().getMonth()}-01`),
@@ -24,7 +26,5 @@ export class TotalIncomeComponent implements OnInit {
         return value - lastMonthIncome;
       }))
     }))
-  }
-  ngOnInit(): void {
   }
 }

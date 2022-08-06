@@ -1,0 +1,51 @@
+<div class="card shadow">
+  <div class="card-header border-0">
+    <div class="row align-items-center">
+      <div class="col">
+        <h3 class="mb-0">Expense Summary</h3>
+      </div>
+      <div class="col text-right">
+        <a routerLink="/transactions" class="btn btn-sm btn-primary">See all</a>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <!-- Projects table -->
+    <table class="table align-items-center table-flush">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Category</th>
+          <th scope="col">Spent</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of expensesByCategories$ | async">
+          <th scope="row">
+            {{ item.category }}
+          </th>
+          <td>
+            {{ item.amount }}
+          </td>
+          <td>
+            <div class="d-flex align-items-center">
+              <span class="mr-2">{{ item.ratio }}%</span>
+              <div>
+                <div class="progress">
+                  <div
+                    class="progress-bar bg-gradient-danger"
+                    role="progressbar"
+                    [attr.aria-valuenow]="item.ratio"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    [ngStyle]="{ width: item.ratio + '%' }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

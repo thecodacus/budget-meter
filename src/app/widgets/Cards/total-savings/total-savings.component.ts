@@ -7,7 +7,6 @@ import { StoreService } from 'src/app/services/store.service';
   templateUrl: './total-savings.component.html',
   styleUrls: ['./total-savings.component.scss']
 })
-
 export class TotalSavingsComponent implements OnInit {
   @Input() title: string = 'Total Savings';
   icon: string = 'fas fa-piggy-bank';
@@ -15,9 +14,11 @@ export class TotalSavingsComponent implements OnInit {
   subtext: string = 'Since last month';
   value$: Observable<number>;
   constructor(public store: StoreService) {
+  }
+  ngOnInit(): void {
     this.value$ = combineLatest([
       this.store.getTotalIncome(new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`), new Date()),
-      this.store.getTotalExpence(new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`), new Date())]
+      this.store.getTotalExpense(new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`), new Date())]
     ).pipe(map(([income, expense]) => {
       return income - expense;
     }))
@@ -26,7 +27,7 @@ export class TotalSavingsComponent implements OnInit {
       `${new Date().getFullYear()}-${new Date().getMonth()}-01`),
       new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`)
     );
-    let lastMonthExpense$ = this.store.getTotalExpence(new Date(
+    let lastMonthExpense$ = this.store.getTotalExpense(new Date(
       `${new Date().getFullYear()}-${new Date().getMonth()}-01`),
       new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`)
     );
@@ -36,7 +37,5 @@ export class TotalSavingsComponent implements OnInit {
           return value - lastMonthIncome + lastMonthExpense;
         }))
       }))
-  }
-  ngOnInit(): void {
   }
 }

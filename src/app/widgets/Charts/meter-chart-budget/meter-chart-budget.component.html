@@ -1,0 +1,17 @@
+<ng-container *ngIf="chartData$ | async as chartData">
+  <app-meter-chart-base [data]="chartData" [title]="'Budget Overview'" [subTitle]="'This months budget'">
+    <app-modal-set-budget></app-modal-set-budget>
+  </app-meter-chart-base>
+  <div class="title">
+    <h1 *ngIf="chartData.datasets[0].data[1]">
+      <i class="fas fa-rupee-sign"></i>
+      <span *ngIf="chartData.datasets[0].data[1] > 999">{{ (chartData.datasets[0].data[1] / 1000).toFixed(1) }}K</span>
+      <span *ngIf="chartData.datasets[0].data[1] <= 999">{{ chartData.datasets[0].data[1] }}</span>
+      Safe to Spend
+    </h1>
+    <h1 *ngIf="chartData.datasets[1]">
+      <i class="fas fa-rupee-sign"></i>
+      {{ chartData.datasets[1].data[0] }} Over Spent
+    </h1>
+  </div>
+</ng-container>

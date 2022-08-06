@@ -1,0 +1,17 @@
+<div class="modal-content">
+    <ng-container [ngSwitch]="contentType">
+        <ng-container *ngSwitchCase="'string'">
+            <div class="box">
+                <div [innerHTML]="content"></div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'template'">
+            <ng-container *ngTemplateOutlet="getTemplateContent(); context: context"></ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'component'">
+            <ng-container *ngComponentOutlet="getComponentContent()"></ng-container>
+        </ng-container>
+    </ng-container>
+</div>

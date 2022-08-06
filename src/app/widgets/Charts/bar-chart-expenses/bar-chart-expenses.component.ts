@@ -21,7 +21,7 @@ export class BarChartExpensesComponent implements OnInit {
   ngOnInit(): void {
     let lastSixMonthNames: string[] = [];
     for (let i = 0; i < 6; i++) {
-      lastSixMonthNames.push(new Date(new Date().getFullYear(), new Date().getMonth() - i + 1, 1).toLocaleDateString('en-US', { month: 'short' }));
+      lastSixMonthNames.push(new Date(new Date().getFullYear(), new Date().getMonth() + i - 5, 1).toLocaleDateString('en-US', { month: 'short' }));
     }
     // get last 6 month expenses
     this.expenses$ = this.store.getTransactionsByType(
@@ -34,7 +34,7 @@ export class BarChartExpensesComponent implements OnInit {
           expensesByMonth.push(0);
         }
         expenses.forEach(expense => {
-          let expenseMonth = new Date(expense.date).getMonth() - new Date(Date.now()).getMonth() + 6;
+          let expenseMonth = new Date((expense.date as any).toDate()).getMonth() - new Date(Date.now()).getMonth() + 5;
           expensesByMonth[expenseMonth] += expense.amount;
         }
         );
