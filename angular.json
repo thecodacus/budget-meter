@@ -25,7 +25,7 @@
             "allowedCommonJsDependencies": ["chart.js"],
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss", "src/assets/scss/argon.scss"],
-            "scripts": ["node_modules/chart.js/dist/Chart.min.js", "node_modules/clipboard/dist/clipboard.min.js"]
+            "scripts": ["node_modules/chart.js/dist/chart.min.js", "node_modules/clipboard/dist/clipboard.min.js"]
           },
           "configurations": {
             "production": {
