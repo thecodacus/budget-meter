@@ -12,12 +12,12 @@ export class CounterPartiesComponent implements OnInit {
   constructor(private store: StoreService) { }
 
   ngOnInit(): void {
-    this.counterparties$ = this.store.getAccounts();
+    this.counterparties$ = this.store.getCounterParties();
   }
-  async deleteAccount(e: MouseEvent, id: string) {
+  async deleteRecord(e: MouseEvent, id: string) {
     e.preventDefault();
     e.stopPropagation();
-    await this.store.deleteAccount(id)
+    await this.store.deleteCounterParty(id)
   }
 
 }

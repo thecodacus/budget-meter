@@ -12,17 +12,14 @@
     <div class="col">
       <div class="card shadow">
         <div class="card-header border-0">
-          <h3 class="mb-0">My Accounts</h3>
+          <h3 class="mb-0">External Entities</h3>
         </div>
         <div class="table-responsive">
           <table class="table align-items-center table-flush">
             <thead class="thead-light">
               <tr>
-                <th scope="col">Account Name</th>
-                <th scope="col">Type</th>
-                <th scope="col">Balance</th>
-                <th scope="col">Last Corrected</th>
-                <th scope="col">Ratio</th>
+                <th scope="col">Entity Name</th>
+                <!-- <th scope="col">Type</th> -->
                 <th scope="col"></th>
               </tr>
             </thead>
@@ -55,7 +52,7 @@
                     </a>
                     <div ngbDropdownMenu class="dropdown-menu-right dropdown-menu-arrow">
                       <a class="dropdown-item" [routerLink]="'' + item.id">View</a>
-                      <a class="dropdown-item" (click)="deleteAccount($event, item.id)">Delete</a>
+                      <a class="dropdown-item" (click)="deleteRecord($event, item.id)">Delete</a>
                     </div>
                   </div>
                 </td>
@@ -92,4 +89,4 @@
     </div>
   </div>
 </div>
-<app-modal-add-account></app-modal-add-account>
+<app-modal-add-counter-party></app-modal-add-counter-party>
