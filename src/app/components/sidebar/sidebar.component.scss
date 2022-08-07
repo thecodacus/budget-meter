@@ -1,6 +1,12 @@
-.brandName{
-    // font-size: 1.5rem;
-    font-weight: bold;
-    color: #f4375b;
-    text-decoration: none;
+.navbar-brand{
+    transform: translate(-20px, 5px);
+    img{
+        filter: hue-rotate(139deg) brightness(1.5) contrast(2);
+    }
+    .brandName{
+        // font-size: 1.5rem;
+        font-weight: bold;
+        color: #f4375b;
+        text-decoration: none;
+    }
 }

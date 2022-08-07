@@ -10,7 +10,7 @@
       <h1 class="brandName">Budget Meter</h1>
     </a>
     <!-- User -->
-    <ul class="nav align-items-center d-md-none">
+    <ul class="nav align-items-center d-md-none" *ngIf="user$ | async as user">
       <li class="nav-item" ngbDropdown placement="bottom-right">
         <a class="nav-link nav-link-icon" role="button" ngbDropdownToggle>
           <i class="ni ni-bell-55"></i>
@@ -26,7 +26,7 @@
         <a class="nav-link" role="button" ngbDropdownToggle>
           <div class="media align-items-center">
             <span class="avatar avatar-sm rounded-circle">
-              <img alt="Image placeholder" src="./assets/img/theme/team-1-800x800.jpg" />
+              <img alt="Image placeholder" [attr.src]="user.photoURL || '/assets/img/theme/react.jpg'" />
             </span>
           </div>
         </a>
@@ -39,19 +39,11 @@
             <span>My profile</span>
           </a>
           <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
-            <i class="ni ni-settings-gear-65"></i>
-            <span>Settings</span>
-          </a>
-          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
-            <i class="ni ni-calendar-grid-58"></i>
-            <span>Activity</span>
-          </a>
-          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
             <i class="ni ni-support-16"></i>
             <span>Support</span>
           </a>
           <div class="dropdown-divider"></div>
-          <a href="#!" class="dropdown-item">
+          <a (click)="logout($event)" class="dropdown-item">
             <i class="ni ni-user-run"></i>
             <span>Logout</span>
           </a>
@@ -64,8 +56,9 @@
       <div class="navbar-collapse-header d-md-none">
         <div class="row">
           <div class="col-6 collapse-brand">
-            <a routerLinkActive="active" [routerLink]="['/dashboard']">
-              <img src="./assets/img/brand/blue.png" />
+            <a class="navbar-brand pt-0" style="display: flex; display: flex; justify-content: flex-start" routerLinkActive="active" [routerLink]="['/dashboard']">
+              <img src="./assets/img/brand/logo.png" class="navbar-brand-img" alt="..." />
+              <h1 class="brandName">Budget Meter</h1>
             </a>
           </div>
           <div class="col-6 collapse-close">

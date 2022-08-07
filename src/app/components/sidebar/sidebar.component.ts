@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from '@angular/fire/auth';
 import { Router } from '@angular/router';
+import { from, Observable } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 declare interface RouteInfo {
   path: string;
@@ -29,14 +32,21 @@ export class SidebarComponent implements OnInit {
 
   public menuItems: any[];
   public isCollapsed = true;
+  public user$: Observable<User>
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private auth: AuthService) {
   }
 
   ngOnInit() {
     this.menuItems = ROUTES.filter(menuItem => menuItem);
+    this.user$ = from(this.auth.getCurrentUser())
     this.router.events.subscribe((event) => {
       this.isCollapsed = true;
     });
+  }
+  logout(e: MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
+    this.auth.logout();
   }
 }
