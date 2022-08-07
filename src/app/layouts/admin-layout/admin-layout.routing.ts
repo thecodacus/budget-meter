@@ -20,8 +20,8 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'transactions/:id', component: TransactionSingleComponent },
     { path: 'counterparties', component: CounterPartiesComponent },
     { path: 'counterparties/:id', component: CounterPartiesSingleComponent },
-    { path: 'user-profile', component: UserProfileComponent },
-    { path: 'tables', component: TablesComponent },
-    { path: 'icons', component: IconsComponent },
-    { path: 'maps', component: MapsComponent }
+    // { path: 'user-profile', component: UserProfileComponent },
+    // { path: 'tables', component: TablesComponent },
+    // { path: 'icons', component: IconsComponent },
+    // { path: 'maps', component: MapsComponent }
 ];
