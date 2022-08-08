@@ -22,6 +22,7 @@ import { ExpenseSummaryTableComponent } from './Tables/expense-summary-table/exp
 import { ModalSetBudgetComponent } from './Popups/modal-set-budget/modal-set-budget.component';
 import { ModalAddAccountComponent } from './Popups/modal-add-account/modal-add-account.component';
 import { RouterModule } from '@angular/router';
+import { ModalAddCounterPartyComponent } from './Popups/modal-add-counter-party/modal-add-counter-party.component';
 
 
 
@@ -43,7 +44,8 @@ import { RouterModule } from '@angular/router';
     TransactionsTableComponent,
     ExpenseSummaryTableComponent,
     ModalSetBudgetComponent,
-    ModalAddAccountComponent
+    ModalAddAccountComponent,
+    ModalAddCounterPartyComponent
   ],
   imports: [
     CommonModule,
@@ -70,7 +72,8 @@ import { RouterModule } from '@angular/router';
     TransactionsTableComponent,
     ExpenseSummaryTableComponent,
     ModalSetBudgetComponent,
-    ModalAddAccountComponent
+    ModalAddAccountComponent,
+    ModalAddCounterPartyComponent
   ]
 })
 export class WidgetsModule { }

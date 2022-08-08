@@ -6,10 +6,23 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./admin-layout.component.scss']
 })
 export class AdminLayoutComponent implements OnInit {
-
+  sticky: boolean = false;
   constructor() { }
 
   ngOnInit() {
+    document.addEventListener('scroll', () => {
+      this.keepTrack();
+    })
+  }
+  keepTrack() {
+    let scrollValue = document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollValue > 90) {
+      this.sticky = true;
+    }
+    else {
+      this.sticky = false;
+    }
+
   }
 
 }

@@ -1,8 +1,8 @@
-<button class="btn btn-icon btn-2 icon icon-shape bg-primary text-white rounded-circle shadow" type="button" (click)="openWithTemplate(tpl)">
+<div class="btn btn-icon btn-2 icon icon-shape bg-primary text-white rounded-circle" type="button" (click)="openWithTemplate(tpl)">
   <span class="btn-inner--icon">
     <i class="fas fa-plus"></i>
   </span>
-</button>
+</div>
 
 <ng-template #tpl>
   <div class="modal-card">
@@ -148,5 +148,10 @@
 <ng-template #success>
   <div class="model-card">
     <h1>Successfully Added Transaction</h1>
+    <footer class="modal-card-foot">
+      <div class="buttons">
+        <button (click)="close()" type="button" class="btn btn-secondary">Close</button>
+      </div>
+    </footer>
   </div>
 </ng-template>

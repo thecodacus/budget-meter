@@ -1,14 +1,14 @@
 /*!
 
 =========================================================
-* Argon Dashboard Angular - v1.4.0
+* Budget Meter - v0.1.0
 =========================================================
 
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-angular
-* Copyright 2019 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-angular/blob/master/LICENSE.md)
+* Product Page:  https://github.com/thecodacus/budget-meter
+* Copyright 2022 The Codacus (https://www.codacus.com)
+* Licensed under MIT (https://github.com/thecodacus/budget-meter/blob/master/LICENSE.md)
 
-* Coded by Creative Tim
+* Coded by The Codacus
 
 =========================================================
 

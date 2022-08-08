@@ -32,7 +32,7 @@ export class ModalAddAccountComponent implements OnInit {
         Address: {}
       })
       this.close()
-      this.dialog.open(success, null)
+      this.modalRef = this.dialog.open(success, null)
     }
   }
 }

@@ -1,0 +1,75 @@
+<button class="btn btn-icon btn-2 icon icon-shape bg-primary text-white rounded-circle" type="button" (click)="openWithTemplate(tpl)">
+  <span class="btn-inner--icon">
+    <i class="fas fa-plus"></i>
+  </span>
+</button>
+
+<ng-template #tpl>
+  <div class="modal-card">
+    <form #f="ngForm" (ngSubmit)="onSubmit(f, success)">
+      <header class="modal-card-head">
+        <h1>Add New Entity</h1>
+      </header>
+      <section class="modal-card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <input type="text" autocomplete="off" name="name" ngModel required style="flex: 1" class="form-control form-control-alternative" placeholder="Name" />
+            </div>
+          </div>
+          <!-- <div class="col-md-6">
+            <div class="form-group">
+              <input
+                autocomplete="off"
+                name="last4Digits"
+                ngModel
+                required
+                minlength="4"
+                maxlength="4"
+                class="form-control form-control-alternative"
+                placeholder="Last 4 digits of account number"
+                type="number"
+              />
+            </div>
+          </div> -->
+        </div>
+        <!-- <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="input-group input-group-alternative mb-4">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                </div>
+                <input
+                  autocomplete="off"
+                  name="balance"
+                  ngModel
+                  required
+                  class="form-control form-control-alternative"
+                  placeholder="Current Balance"
+                  type="number"
+                />
+              </div>
+            </div>
+          </div>
+        </div> -->
+      </section>
+      <footer class="modal-card-foot">
+        <div class="buttons">
+          <button (click)="close()" type="button" class="btn btn-secondary">Close</button>
+          <button type="submit" class="btn btn-default">Add</button>
+        </div>
+      </footer>
+    </form>
+  </div>
+</ng-template>
+<ng-template #success>
+  <div class="model-card">
+    <h1>Successfully Added Entity</h1>
+    <footer class="modal-card-foot">
+      <div class="buttons">
+        <button (click)="close()" type="button" class="btn btn-secondary">Close</button>
+      </div>
+    </footer>
+  </div>
+</ng-template>

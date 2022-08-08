@@ -1,6 +1,6 @@
 {
-  "name": "argon-dashboard-angular",
-  "version": "1.4.0",
+  "name": "budget-meter",
+  "version": "0.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -24,6 +24,11 @@
     "@angular/platform-browser": "^13.3.1",
     "@angular/platform-browser-dynamic": "^13.3.1",
     "@angular/router": "^13.3.1",
+    "@capacitor/android": "^4.0.1",
+    "@capacitor/angular": "^2.0.3",
+    "@capacitor/core": "latest",
+    "@capacitor/ios": "^4.0.1",
+    "@capawesome/capacitor-screen-orientation": "^2.0.0",
     "@ng-bootstrap/ng-bootstrap": "12.0.1",
     "@popperjs/core": "^2.11.4",
     "bootstrap": "4.6.1",
@@ -41,6 +46,7 @@
     "@angular/cli": "^13.3.1",
     "@angular/compiler-cli": "^13.3.1",
     "@angular/language-service": "13.3.1",
+    "@capacitor/cli": "latest",
     "@types/jasmine": "~3.10.3",
     "@types/jasminewd2": "~2.0.10",
     "@types/node": "16.3.2",
