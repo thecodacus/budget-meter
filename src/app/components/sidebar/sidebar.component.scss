@@ -1,5 +1,5 @@
 .navbar-brand{
-    transform: translate(-20px, 5px);
+    transform: translate(-7px, 0px);
     img{
         filter: hue-rotate(139deg) brightness(1.5) contrast(2);
     }
@@ -8,5 +8,49 @@
         font-weight: bold;
         color: #f4375b;
         text-decoration: none;
+        margin: 0;
+        // font-size: 1.5rem;
+    }
+}
+
+// menu collapsed
+@media (max-width: 767.98px) {
+    .navbar{
+        padding: 0.5rem 1rem;
+    }
+    .navbar-brand{
+        img{
+            max-height: 6vw;
+        }
+        .brandName{
+           font-size: calc(4vw);
+        }
+    }
+    .navbar-collapse {
+        // width: calc(100% - 1.4rem);
+        position: fixed;
+        top: 0;
+        left: 0px;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        overflow-y: auto;
+        height: auto !important;
+        display: block;
+        opacity: 1;
+        background: white;
+        padding: 1rem;
+        /* margin: 1rem; */
+        box-sizing: border-box;
+        box-shadow: rgb(0 0 0 / 35%) 0px 5px 15px;
+        z-index: 3000;
+        width: 350px;
+        // transition: cubic-bezier(0.075, 0.82, 0.165, 1);
+        transition: left 350ms cubic-bezier(0.075, 0.82, 0.165, 1);
+    }
+    .navbar-collapse:not(.expanded){
+        left: -392px;
+        // transition: cubic-bezier(0.075, 0.82, 0.165, 1);
+        transition: left 350ms cubic-bezier(0.075, 0.82, 0.165, 1);
     }
 }

@@ -30,7 +30,7 @@ export class ModalAddCounterPartyComponent implements OnInit {
         ...f.value,
       })
       this.close()
-      this.dialog.open(success, null)
+      this.modalRef = this.dialog.open(success, null)
     }
   }
 

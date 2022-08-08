@@ -51,7 +51,7 @@
       </li>
     </ul>
     <!-- Collapse -->
-    <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed" id="sidenav-collapse-main">
+    <div class="collapse navbar-collapse" [ngClass]="{ expanded: !isCollapsed }">
       <!-- Collapse header -->
       <div class="navbar-collapse-header d-md-none">
         <div class="row">
@@ -74,7 +74,7 @@
         <div class="input-group input-group-rounded input-group-merge">
           <input type="search" class="form-control form-control-rounded form-control-prepended" placeholder="Search" aria-label="Search" />
           <div class="input-group-prepend">
-            <div class="input-group-text">
+            <div class="input-group-text" style="border-top-right-radius: 0.375rem; border-bottom-right-radius: 0.375rem">
               <span class="fa fa-search"></span>
             </div>
           </div>
