@@ -1,5 +1,5 @@
 .navbar-brand{
-    transform: translate(-20px, 5px);
+    transform: translate(-7px, 0px);
     img{
         filter: hue-rotate(139deg) brightness(1.5) contrast(2);
     }
@@ -8,5 +8,7 @@
         font-weight: bold;
         color: #f4375b;
         text-decoration: none;
+        margin: 0;
+        // font-size: 1.5rem;
     }
 }
