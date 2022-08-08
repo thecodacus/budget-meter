@@ -52,7 +52,7 @@ export class AddTransactionsComponent implements OnInit {
         category: TransactionCategory[f.value.category]
       })
       this.close()
-      this.dialog.open(success, null)
+      this.modalRef = this.dialog.open(success, null)
     }
   }
 }

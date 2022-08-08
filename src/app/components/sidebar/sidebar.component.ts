@@ -33,6 +33,7 @@ export class SidebarComponent implements OnInit {
   public menuItems: any[];
   public isCollapsed = true;
   public user$: Observable<User>
+  public expandMenu: boolean = false;
 
   constructor(private router: Router, private auth: AuthService) {
   }

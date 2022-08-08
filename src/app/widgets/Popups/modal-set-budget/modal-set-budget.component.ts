@@ -32,7 +32,7 @@ export class ModalSetBudgetComponent implements OnInit {
         monthly: f.value.amount
       })
       this.close()
-      this.dialog.open(success, null)
+      this.modalRef = this.dialog.open(success, null)
     }
   }
 

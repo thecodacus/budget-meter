@@ -6,6 +6,8 @@
 /out-tsc
 /.angular
 /www
+/resources/android/
+/resources/ios/
 
 # dependencies
 /node_modules
