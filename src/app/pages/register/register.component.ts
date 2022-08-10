@@ -37,5 +37,15 @@ export class RegisterComponent implements OnInit {
     }
     this.disable = false
   }
+  async signUpGoogle(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    await this.auth.loginWithGoogle();
+  }
+  async signUpGithub(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    await this.auth.loginWithGithub();
+  }
 
 }

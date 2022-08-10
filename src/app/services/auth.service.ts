@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
+import { GithubAuthProvider, GoogleAuthProvider } from '@angular/fire/auth'
 import { Router } from '@angular/router';
 import { StoreService } from './store.service';
 @Injectable({
@@ -50,11 +51,27 @@ export class AuthService {
   async getCurrentUser() {
     return await this.auth.currentUser
   }
-
   async logout() {
     await this.auth.signOut();
     localStorage.removeItem('token')
     localStorage.removeItem('creds')
     this.router.navigate(["/login"]);
+  }
+  async loginWithGoogle() {
+    let provider = new GoogleAuthProvider()
+    let resp = await this.auth.signInWithPopup(provider)
+    localStorage.setItem('token', 'true');
+    localStorage.setItem('creds', JSON.stringify(resp))
+    this.router.navigate(['/dashboard']);
+    this.store.setStore(resp.user.uid);
+  }
+  async loginWithGithub() {
+    let provider = new GithubAuthProvider()
+    provider.addScope('read:user');
+    let resp = await this.auth.signInWithPopup(provider)
+    localStorage.setItem('token', 'true');
+    localStorage.setItem('creds', JSON.stringify(resp))
+    this.router.navigate(['/dashboard']);
+    this.store.setStore(resp.user.uid);
   }
 }
