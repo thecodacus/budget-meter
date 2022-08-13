@@ -30,12 +30,22 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       await this.auth.loginWithEmail(f.value.email, f.value.password);
       f.resetForm();
-      
+
     } catch (error) {
       console.log(error);
 
     }
     this.disable = false
+  }
+  async loginGoogle(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    await this.auth.loginWithGoogle();
+  }
+  async loginGithub(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    await this.auth.loginWithGithub();
   }
 
 }
