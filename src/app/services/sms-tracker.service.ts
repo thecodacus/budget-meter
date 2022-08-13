@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { SmsReader } from 'capacitor-sms-reader'
+// import { SmsReader } from 'capacitor-sms-reader'
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,8 @@ export class SmsTrackerService {
     this.SyncSms()
   }
   async SyncSms() {
-    let result = await SmsReader.readSms({ count: 100 });
+    // let result = await SmsReader.readSms({ count: 100 });
+    let result = []
     // console.log(result);
     return result;
   }
