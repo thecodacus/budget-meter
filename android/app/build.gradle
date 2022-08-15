@@ -9,8 +9,8 @@ android {
             keyPassword 'android'
         }
       release {
-        storeFile file('/Users/anirbankar/.android/prod.keystore')
-        storePassword '039039820'
+          storeFile file('/Users/anirbankar/.android/prod.keystore')
+          storePassword '039039820'
         keyAlias 'codacus'
         keyPassword '039039820'
       }

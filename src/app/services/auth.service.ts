@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
-import { GithubAuthProvider, GoogleAuthProvider } from '@angular/fire/auth'
+import { AuthCredential, GithubAuthProvider, GoogleAuthProvider } from '@angular/fire/auth'
 import { Router } from '@angular/router';
 import { StoreService } from './store.service';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth'
 import { environment } from 'src/environments/environment';
+import { Capacitor } from '@capacitor/core';
 @Injectable({
   providedIn: 'root'
 })
@@ -16,13 +17,11 @@ export class AuthService {
 
       if (user) this.store.setStore(user.uid)
     })
-    // use hook after platform dom ready
     GoogleAuth.initialize({
       clientId: environment.appInfo.clientID,
       scopes: ['profile', 'email'],
       grantOfflineAccess: true,
     });
-
   }
   async loginWithEmail(email: string, password: string) {
     try {
@@ -66,9 +65,20 @@ export class AuthService {
     this.router.navigate(["/login"]);
   }
   async loginWithGoogle() {
-    let googleUser = await GoogleAuth.signIn();
-    const credential = GoogleAuthProvider.credential(googleUser.authentication.idToken);
-    let resp = await this.auth.signInWithCredential(credential);
+    console.log('login with google,');
+    let platform = Capacitor.getPlatform();
+    let resp = null;
+    if (platform == 'web') {
+      let provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
+      resp = await this.auth.signInWithPopup(provider)
+    }
+    else {
+      let googleUser = await GoogleAuth.signIn();
+      const credential = GoogleAuthProvider.credential(googleUser.authentication.idToken);
+      resp = await this.auth.signInWithCredential(credential);
+    }
     localStorage.setItem('token', 'true');
     localStorage.setItem('creds', JSON.stringify(resp))
     this.router.navigate(['/dashboard']);
