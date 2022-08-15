@@ -1,6 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+          storeFile file('/Users/anirbankar/.android/debug.keystore')
+          storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+      release {
+        storeFile file('/Users/anirbankar/.android/prod.keystore')
+        storePassword '039039820'
+        keyAlias 'codacus'
+        keyPassword '039039820'
+      }
+    }
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.codacus.budgetmeter"

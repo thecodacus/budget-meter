@@ -7,8 +7,8 @@
 .navbar-horizontal .navbar-brand {
   img{
     height: 38px;
-    filter: brightness(5);
-    -webkit-filter: brightness(5);
+    filter: brightness(5) hue-rotate(246deg);
+    -webkit-filter: brightness(5) hue-rotate(246deg);
   }
   h1{
     color: white;

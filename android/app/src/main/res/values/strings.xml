@@ -4,4 +4,5 @@
     <string name="title_activity_main">Budget Meter</string>
     <string name="package_name">com.codacus.budgetmeter</string>
     <string name="custom_url_scheme">com.codacus.budgetmeter</string>
+    <string name="server_client_id">1056763945939-euvn7639jr03uufc8akgar0gagn0jcm1.apps.googleusercontent.com</string>
 </resources>

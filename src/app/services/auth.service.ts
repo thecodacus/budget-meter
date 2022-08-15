@@ -3,6 +3,8 @@ import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { GithubAuthProvider, GoogleAuthProvider } from '@angular/fire/auth'
 import { Router } from '@angular/router';
 import { StoreService } from './store.service';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth'
+import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
@@ -14,6 +16,12 @@ export class AuthService {
 
       if (user) this.store.setStore(user.uid)
     })
+    // use hook after platform dom ready
+    GoogleAuth.initialize({
+      clientId: environment.appInfo.clientID,
+      scopes: ['profile', 'email'],
+      grantOfflineAccess: true,
+    });
 
   }
   async loginWithEmail(email: string, password: string) {
@@ -58,8 +66,9 @@ export class AuthService {
     this.router.navigate(["/login"]);
   }
   async loginWithGoogle() {
-    let provider = new GoogleAuthProvider()
-    let resp = await this.auth.signInWithPopup(provider)
+    let googleUser = await GoogleAuth.signIn();
+    const credential = GoogleAuthProvider.credential(googleUser.authentication.idToken);
+    let resp = await this.auth.signInWithCredential(credential);
     localStorage.setItem('token', 'true');
     localStorage.setItem('creds', JSON.stringify(resp))
     this.router.navigate(['/dashboard']);

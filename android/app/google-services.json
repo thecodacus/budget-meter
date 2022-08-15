@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1056763945939",
+    "project_id": "codacus-apps",
+    "storage_bucket": "codacus-apps.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056763945939:android:9d43efe9467dd445e7c526",
+        "android_client_info": {
+          "package_name": "com.codacus.budgetmeter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1056763945939-i5c5c275su204j9qaq68dsgreqb0ni8k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codacus.budgetmeter",
+            "certificate_hash": "8e92a663de12b93550562dfe9f5e4332fa415205"
+          }
+        },
+        {
+          "client_id": "1056763945939-euvn7639jr03uufc8akgar0gagn0jcm1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUxE6RGOy3wsf6q0GOCViteA7DCwmgGYw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1056763945939-euvn7639jr03uufc8akgar0gagn0jcm1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
